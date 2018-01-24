@@ -1,0 +1,59 @@
+
+Uudessa kytkennässä:
+-sininen pari ohjaa vasenta moottoria, punainen/oranssi oikeaa.
+
+-Telalappujen määrä: 72 vasen 73 oikea
+
+Moottoreiden Virrankulutus:
+
+Nosto: 60 mA @5v
+tykki: ~1A @5v
+kääntö: 250mA @5v
+
+Torniin arduino nano, tykin nosto servolla, komentajan kupolaan akun varaustason tarkistuspainike tai vastaava ja "Status LEDit" 4 RGB lediä jotka ilmaisevat kunkin kennon varaustason. Voi käyttää vaikka Megan valmiita serial-portteja tai software serialia. Nanon päässä SoftwareSerial tai Serial (sisäänrakennettu). Jos SoftwareSerialia niin pääkallo ei voi 
+vastaanottaa dataa tornista.
+Nano nastavaatimukset:
+Servo 4
+Ampu 3
+LASER 11
+konsuledi 7
+4*2 tai 4*3 RGB LED
+nappi
+Yhteensä 11 tai 12
+
+Pääkallolta keskilevylle:
+Serial Rx
+Serial Tx
+Kääntö oikea
+Kääntö vasen
+Tuulettimen on
+yhteensä 5 + ehkä ground
+
+Keskilevyltä ylöspäin:
+Serial Rx
+Serial Tx
+Kääntö oikea
+Kääntö vasen
++5V
+GND
+
+Paketti megalta arduinoon:
+coax led (bool)
+coax laser (bool)
+ampu (bool)
+nosto ylös (bool)
+nosto alas (bool)
+4x akun varaustaso (4x byte 0-255)
+
+(byte) 1
+(byte) 2
+(byte) 0b000(led)(laser)(ampu)(ylös)(alas) = 0b000xxxxx
+(byte) a
+(byte) akku[0]
+(byte) b
+(byte) akku[1]
+(byte) c
+(byte) akku[2]
+(byte) d
+(byte) akku[3]
+(byte) f
