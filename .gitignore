@@ -1,0 +1,6 @@
+__vm
+*.vs
+*.sln
+*.vcxproj
+*.filters
+*.user
