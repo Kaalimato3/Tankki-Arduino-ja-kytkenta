@@ -18,8 +18,8 @@ Author:	Simo
 
 #define MAX_ELEV 150
 #define MIN_ELEV 0
-#define CMD_MIN_ELEV 169
-#define CMD_MAX_ELEV 85
+#define CMD_MIN_ELEV 254
+#define CMD_MAX_ELEV 0
 
 #define CMD_LENGTH 4
 

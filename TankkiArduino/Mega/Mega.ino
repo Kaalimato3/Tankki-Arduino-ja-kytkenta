@@ -10,10 +10,13 @@
 #define vTaakse 3 // SiVa
 #define oTaakse 10 // OrVa
 
+#define FAN_PIN 7
+
+#define TURRET_TURN_CCW 5
+#define TURRET_TURN_CW 6
+
 #define rxPin 2
 #define txPin 4
-
-#define MIN_VEL 10
 
 #define PACKET_SIZE 9
 
@@ -35,26 +38,32 @@ unsigned long timer1 = 0;
 
 int velLeft = 127;
 int velRight = 127;
-//SoftwareSerial mSoftSerial(rxPin, txPin);
-Tankki tank(vEteen, vTaakse, oEteen, oTaakse);
+int turretTurn = 127;
+Tankki tank(vEteen, vTaakse, oEteen, oTaakse, TURRET_TURN_CCW, TURRET_TURN_CW);
 TankkiRemoteTurret turret(Serial2);
 
 void setup() {
-    pinMode(2, INPUT); // pin2 ja 4 kytketty Serial kolmoseen
-    pinMode(4, INPUT);
-    Serial.begin(38400);
-    Serial.println("Hello!");
+    pinMode(rxPin, INPUT); // pin2 ja 4 kytketty Serial kolmoseen
+    pinMode(txPin, INPUT);
+    Serial.begin(38400); // For debugging via USB
     Serial2.begin(9600);   // Serial 2: Rx 17, Tx 16 ; Nano/turret communication
     Serial3.begin(9600);   // Serial 3: Rx 15, Tx 14 ; Bluetooth communication
                            // Kuitenkin näyttää siltä että vakiotaajuus (490) on parempi
                            //TCCR1B = (TCCR1B & 0b11111000) | 0x01; // Nastat 9 ja 10 31372.55Hz
                            //TCCR2B = (TCCR2B & 0b11111000) | 0x01; // Nastat 11 ja 3 31372.55Hz
-    pinMode(oTaakse, OUTPUT);
-    pinMode(oEteen, OUTPUT);
-    pinMode(vTaakse, OUTPUT);
-    pinMode(vEteen, OUTPUT);
+    tank.begin();
+    //pinMode(oTaakse, OUTPUT);
+    //pinMode(oEteen, OUTPUT);
+    //pinMode(vTaakse, OUTPUT);
+    //pinMode(vEteen, OUTPUT);
+    //
+    //pinMode(FAN_PIN, OUTPUT);
+    //
+    //pinMode(TURRET_TURN_CCW, OUTPUT);
+    //pinMode(TURRET_TURN_CW, OUTPUT);
     tank.stopLeft();
     tank.stopRight();
+    tank.stopTurret();
 }
 
 void loop() {
@@ -76,14 +85,15 @@ void loop() {
 
         TurretCommand turretCmd;
 
-        Serial.print("\n");
         if (cmd[0] == 1 && cmd[1] == 255) {
             velRight = cmd[2];
             velLeft = cmd[3];
+            turretTurn = cmd[5];
             turretCmd.elevation = cmd[4];
             turretCmd.cannon = cmd[6] > 0;
             turretCmd.mg = cmd[8] > 0;
             turretCmd.laser = cmd[7] > 0;
+
             /*for (int i = 0; i < 6; i++)
             {
             Serial.print(cmd[i]);
@@ -91,21 +101,23 @@ void loop() {
             }*/
         }
 
+        tank.turnTurret(turretTurn);
         tank.moveRight(velRight);
         tank.moveLeft(velLeft);
         turret.sendMsg(turretCmd);
+        Serial.print("\n");
     }
     else if (Serial3.available() > PACKET_SIZE) {
         Serial3.read();
     }
     else {
-        //mSoftSerial.read();
         timer0 = millis();  //Get the current time (millis since execution started).
                             //Check if it has been 500ms since we received last command.
         if ((timer0 - timer1)>500) {
             //More tan 500ms have passed since last command received, car is out of range.
             tank.stopLeft();
             tank.stopRight();
+            tank.stopTurret();
         }
     }
 }
