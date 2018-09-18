@@ -11,10 +11,10 @@ Author:	Simo
 #define LASER_BIT	0b00000010
 #define MG_BIT		0b00000100
 
-#define ampuPin 3
-#define laserPin 11
-#define ledPin 10
-#define servoPin 4
+#define CANNON_PIN 3
+#define LASER_PIN 11
+#define LED_PIN 10
+#define SERVO_PIN 4
 
 #define MAX_ELEV 150
 #define MIN_ELEV 0
@@ -23,20 +23,18 @@ Author:	Simo
 
 #define CMD_LENGTH 4
 
-bool ampu = 0, konsu = 0, laser = 0;
-int akku[4];
+int batt[4];
 byte cmd[CMD_LENGTH];
-int korko = 0;
 Servo servo;
 long time = 0;
 int curElev = 0;
 
 void setup() {
     Serial.begin(9600);
-    pinMode(ampuPin, OUTPUT);
-    pinMode(laserPin, OUTPUT);
-    pinMode(ledPin, OUTPUT);
-    servo.attach(servoPin);
+    pinMode(CANNON_PIN, OUTPUT);
+    pinMode(LASER_PIN, OUTPUT);
+    pinMode(LED_PIN, OUTPUT);
+    servo.attach(SERVO_PIN);
 }
 
 void loop() {
@@ -53,8 +51,8 @@ void loop() {
             Serial.print("\t");
         }
 
-        digitalWrite(laserPin, ((cmd[3] & LASER_BIT) > 0) ? HIGH : LOW);
-        digitalWrite(ledPin, ((cmd[3] & MG_BIT) > 0) ? HIGH : LOW);
+        digitalWrite(LASER_PIN, ((cmd[3] & LASER_BIT) > 0) ? HIGH : LOW);
+        digitalWrite(LED_PIN, ((cmd[3] & MG_BIT) > 0) ? HIGH : LOW);
         if (cmd[2] != 127) {
             if (map(cmd[2], CMD_MAX_ELEV, CMD_MIN_ELEV, MIN_ELEV, MAX_ELEV) > curElev) {
                 if (curElev <= MAX_ELEV)
