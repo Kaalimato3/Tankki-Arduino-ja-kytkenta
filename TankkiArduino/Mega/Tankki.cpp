@@ -56,21 +56,21 @@ void Tankki::stopRight() {
 
 void Tankki::turnTurret(uint8_t val)
 {
-    Serial.print("turnTurret val: ");
-    Serial.print(val);
-    Serial.print("\t");
+    //Serial.print("turnTurret val: ");
+    //Serial.print(val);
+    //Serial.print("\t");
     if (val > 127) {
-        Serial.print("CW");
+        //Serial.print("CW");
         analogWrite(m_turretCCWPin, 0);
         analogWrite(m_turretCWPin, map(val, 127, 254, 10, 255));
     }
     else if (val < 127) {
-        Serial.print("CCW");
+        //Serial.print("CCW");
         analogWrite(m_turretCWPin, 0);
         analogWrite(m_turretCCWPin, map(val, 127, 0, 10, 255));
     }
     else {
-        Serial.print("0");
+        //Serial.print("0");
         stopTurret();
     }
 }

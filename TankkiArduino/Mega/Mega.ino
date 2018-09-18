@@ -44,6 +44,9 @@ int turretTurn = 127;
 Tankki tank(LEFT_FORWARD_PIN, LEFT_BACKWARD_PIN, RIGHT_FORWARD_PIN, RIGHT_BACKWARD_PIN, TURRET_TURN_CCW, TURRET_TURN_CW);
 TankkiRemoteTurret turret(Serial2);
 
+int temp1 = 0;
+int temp2 = 0;
+
 void setup() {
     pinMode(BT_RX_PIN, INPUT); // pin2 and 4 connected to Serial3 pins
     pinMode(BT_TX_PIN, INPUT);
@@ -65,6 +68,8 @@ void setup() {
 }
 
 void loop() {
+    temp1 = analogRead(TEMP1_PIN);
+    temp2 = analogRead(TEMP2_PIN);
     //Serial.print("loop() begin S3.available(): ");
     //Serial.print(Serial3.available());
     //Serial.print("Serial3.peek(): ");
@@ -75,11 +80,15 @@ void loop() {
             cmd[i] = Serial3.read();
         }
 
-        for (int i = 0; i < PACKET_SIZE; i++)
-        {
-            Serial.print(cmd[i]);
-            Serial.print("\t");
-        }
+        //for (int i = 0; i < PACKET_SIZE; i++)
+        //{
+        //    Serial.print(cmd[i]);
+        //    Serial.print("\t");
+        //}
+
+        Serial.print(temp1);
+        Serial.print('\t');
+        Serial.print(temp2);
 
         TurretCommand turretCmd;
 
@@ -111,5 +120,14 @@ void loop() {
             tank.stopRight();
             tank.stopTurret();
         }
+    }
+
+    // Temperature monitoring and fan control
+    
+    if (temp1 < 250 || temp2 < 250) {
+        digitalWrite(FAN_PIN, HIGH);
+    }
+    if (temp1 > 300 && temp2 > 300) {
+        digitalWrite(FAN_PIN, LOW);
     }
 }
