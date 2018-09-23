@@ -123,7 +123,7 @@ void loop() {
     }
 
     // Temperature monitoring and fan control
-    
+    // Room temp : 576 - 568
     if (temp1 < 250 || temp2 < 250) {
         digitalWrite(FAN_PIN, HIGH);
     }
