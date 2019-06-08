@@ -3,7 +3,7 @@
  Created:	9/15/2018 12:40:08 AM
  Author:	Simo
 */
-#include "Tankki.h"
+#include "TankkiBrushed.h"
 #include "TankkiRemoteTurret.h"
 #define LEFT_FORWARD_PIN 11 // blue wire
 #define RIGHT_FORWARD_PIN 9 // orange wire
@@ -33,6 +33,8 @@ struct TankCommand {
     bool mg;
 };
 
+//#define commandSource Serial
+#define commandSource Serial3
 
 byte cmd[PACKET_SIZE];
 
@@ -41,7 +43,7 @@ unsigned long lastCmdReceiveTime = 0;
 int velLeft = 127;
 int velRight = 127;
 int turretTurn = 127;
-Tankki tank(LEFT_FORWARD_PIN, LEFT_BACKWARD_PIN, RIGHT_FORWARD_PIN, RIGHT_BACKWARD_PIN, TURRET_TURN_CCW, TURRET_TURN_CW);
+TankkiBrushed tank(LEFT_FORWARD_PIN, LEFT_BACKWARD_PIN, RIGHT_FORWARD_PIN, RIGHT_BACKWARD_PIN, TURRET_TURN_CCW, TURRET_TURN_CW);
 TankkiRemoteTurret turret(Serial2);
 
 int temp1 = 0;
@@ -50,9 +52,10 @@ int temp2 = 0;
 void setup() {
     pinMode(BT_RX_PIN, INPUT); // pin2 and 4 connected to Serial3 pins
     pinMode(BT_TX_PIN, INPUT);
-    Serial.begin(38400); // For debugging via USB
+    commandSource.begin(9600);
+    //Serial.begin(38400); // For debugging via USB
     Serial2.begin(9600); // Serial 2: Rx 17, Tx 16 ; Nano/turret communication
-    Serial3.begin(9600); // Serial 3: Rx 15, Tx 14 ; Bluetooth communication
+    //Serial3.begin(9600); // Serial 3: Rx 15, Tx 14 ; Bluetooth communication
     // Uncomment below lines to change motor control frequency
     // See below link for specific frequency values
     // http://playground.arduino.cc/Main/TimerPWMCheatsheet
@@ -71,25 +74,25 @@ void loop() {
     temp1 = analogRead(TEMP1_PIN);
     temp2 = analogRead(TEMP2_PIN);
     //Serial.print("loop() begin S3.available(): ");
-    //Serial.print(Serial3.available());
-    //Serial.print("Serial3.peek(): ");
-    //Serial.print(Serial3.peek());
-    if (Serial3.available() == PACKET_SIZE && Serial3.peek() == 1) {
+    //Serial.print(commandSource.available());
+    //Serial.print("commandSource.peek(): ");
+    //Serial.print(commandSource.peek());
+    if (commandSource.available() == PACKET_SIZE && commandSource.peek() == 1) {
         lastCmdReceiveTime = millis();
         for (int i = 0; i < PACKET_SIZE; i++) {
-            cmd[i] = Serial3.read();
+            cmd[i] = commandSource.read();
         }
 
-        //for (int i = 0; i < PACKET_SIZE; i++)
-        //{
-        //    Serial.print(cmd[i]);
-        //    Serial.print("\t");
-        //}
-
+        for (int i = 0; i < PACKET_SIZE; i++)
+        {
+            Serial.print(cmd[i]);
+            Serial.print("\t");
+        }
+        /*
         Serial.print(temp1);
         Serial.print('\t');
         Serial.print(temp2);
-
+        */
         TurretCommand turretCmd;
 
         if (cmd[0] == 1 && cmd[1] == 255) {
@@ -106,10 +109,10 @@ void loop() {
         tank.moveRight(velRight);
         tank.moveLeft(velLeft);
         turret.sendMsg(turretCmd);
-        Serial.print("\n");
+        //Serial.print("\n");
     }
-    else if (Serial3.available() > PACKET_SIZE) {
-        Serial3.read();
+    else if (commandSource.available() > PACKET_SIZE) {
+        commandSource.read();
     }
     else {
         // Get the current time (millis since execution started).
