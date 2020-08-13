@@ -4,6 +4,7 @@
  Author:	Simo
 */
 #include "TankkiBrushed.h"
+#include "TankkiBrushless.h"
 #include "TankkiRemoteTurret.h"
 #define LEFT_FORWARD_PIN 11 // blue wire
 #define RIGHT_FORWARD_PIN 9 // orange wire
@@ -43,7 +44,8 @@ unsigned long lastCmdReceiveTime = 0;
 int velLeft = 127;
 int velRight = 127;
 int turretTurn = 127;
-TankkiBrushed tank(LEFT_FORWARD_PIN, LEFT_BACKWARD_PIN, RIGHT_FORWARD_PIN, RIGHT_BACKWARD_PIN, TURRET_TURN_CCW, TURRET_TURN_CW);
+//TankkiBrushed tank(LEFT_FORWARD_PIN, LEFT_BACKWARD_PIN, RIGHT_FORWARD_PIN, RIGHT_BACKWARD_PIN, TURRET_TURN_CCW, TURRET_TURN_CW);
+TankkiBrushless tank(LEFT_BACKWARD_PIN, RIGHT_FORWARD_PIN, TURRET_TURN_CCW, TURRET_TURN_CW);
 TankkiRemoteTurret turret(Serial2);
 
 int temp1 = 0;
@@ -54,7 +56,7 @@ void setup() {
     pinMode(BT_TX_PIN, INPUT);
     commandSource.begin(9600);
     //Serial.begin(38400); // For debugging via USB
-    Serial2.begin(9600); // Serial 2: Rx 17, Tx 16 ; Nano/turret communication
+    //Serial2.begin(9600); // Serial 2: Rx 17, Tx 16 ; Nano/turret communication
     //Serial3.begin(9600); // Serial 3: Rx 15, Tx 14 ; Bluetooth communication
     // Uncomment below lines to change motor control frequency
     // See below link for specific frequency values
@@ -119,6 +121,7 @@ void loop() {
         // Check if it has been 500ms since we received last command.
         if ((millis() - lastCmdReceiveTime)>500) {
             //More tan 500ms have passed since last command received, tank is out of range.
+            Serial.println("Connection lost");
             tank.stopLeft();
             tank.stopRight();
             tank.stopTurret();
@@ -127,10 +130,10 @@ void loop() {
 
     // Temperature monitoring and fan control
     // Room temp : 576 - 568
-    if (temp1 < 250 || temp2 < 250) {
-        digitalWrite(FAN_PIN, HIGH);
-    }
-    if (temp1 > 300 && temp2 > 300) {
-        digitalWrite(FAN_PIN, LOW);
-    }
+    //if (temp1 < 250 || temp2 < 250) {
+    //    digitalWrite(FAN_PIN, HIGH);
+    //}
+    //if (temp1 > 300 && temp2 > 300) {
+    //    digitalWrite(FAN_PIN, LOW);
+    //}
 }

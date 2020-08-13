@@ -1,0 +1,8 @@
+orig motor rpm:
+    4s lipo 14.6v:
+        max: spekrillä 38700, audacityllä 21168
+        min: 0
+3670/3Y
+    4s lipo:
+        max: 30540, audacityllä 25200
+        min: 3540, audacityllä 3195
